@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<!--
+  sample.html — Development/testing fixture for rockauto-closeout-watcher.
+
+  This file simulates RockAuto closeout HTML structure.
+  Replace it with a real saved page from RockAuto for production calibration.
+
+  To save a real page:
+    1. Visit the RockAuto closeout / wholesaler page in your browser
+    2. Press Ctrl+S (or Cmd+S on macOS)
+    3. Choose "Web Page, Complete"
+    4. Replace this file with the saved .html file
+    5. Run: python monitor.py --calibrate samples/sample.html
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RockAuto Closeout — Sample (Dev Fixture)</title>
+</head>
+<body>
+
+<h1>Closeout / Wholesaler Special Deals</h1>
+
+<table id="partlist">
+  <thead>
+    <tr>
+      <th>Part Description</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <!-- ✅ CONFIRMED MATCH: front, right, caliper, sport -->
+    <tr class="listing-final-product">
+      <td>
+        <a href="/en/catalog/nissan/370z/brake_caliper/123456">
+          CARDONE Front Right Brake Caliper w/ Sport Brakes
+        </a>
+        <br/>
+        <small>Fits: 2009-2020 Nissan 370Z (Sport Package / Akebono)</small>
+      </td>
+      <td>$45.99</td>
+    </tr>
+
+    <!-- ✅ CONFIRMED MATCH: passenger side, akebono, caliper, front -->
+    <tr class="listing-final-product">
+      <td>
+        <a href="/en/catalog/nissan/370z/brake_caliper/234567">
+          Akebono Passenger Side Front Brake Caliper
+        </a>
+        <br/>
+        <small>Fits: 2009-2019 Nissan 370Z with Sport Brakes</small>
+      </td>
+      <td>$89.99</td>
+    </tr>
+
+    <!-- ✅ POSSIBLE MATCH: front, right, caliper — no sport keyword -->
+    <tr class="listing-final-product">
+      <td>
+        <a href="/en/catalog/nissan/370z/brake_caliper/345678">
+          Centric Parts Front Right Brake Caliper
+        </a>
+        <br/>
+        <small>Fits: 2009-2020 Nissan 370Z</small>
+      </td>
+      <td>$38.50</td>
+    </tr>
+
+    <!-- ❌ REJECTED: left side -->
+    <tr class="listing-final-product">
+      <td>
+        <a href="/en/catalog/nissan/370z/brake_caliper/456789">
+          CARDONE Front Left Brake Caliper
+        </a>
+        <br/>
+        <small>Fits: 2009-2020 Nissan 370Z</small>
+      </td>
+      <td>$45.99</td>
+    </tr>
+
+    <!-- ❌ REJECTED: driver side -->
+    <tr class="listing-final-product">
+      <td>
+        <a href="/en/catalog/nissan/370z/brake_caliper/567890">
+          Raybestos Driver Side Front Brake Caliper
+        </a>
+      </td>
+      <td>$41.00</td>
+    </tr>
+
+    <!-- ❌ REJECTED: rear -->
+    <tr class="listing-final-product">
+      <td>
+        <a href="/en/catalog/nissan/370z/brake_caliper/678901">
+          CARDONE Rear Right Brake Caliper
+        </a>
+      </td>
+      <td>$35.00</td>
+    </tr>
+
+    <!-- ❌ REJECTED: not a caliper -->
+    <tr class="listing-final-product">
+      <td>
+        <a href="/en/catalog/nissan/370z/brake_pads/789012">
+          Front Brake Pad Set — Sport Performance
+        </a>
+      </td>
+      <td>$22.00</td>
+    </tr>
+
+    <!-- ✅ CONFIRMED MATCH: RH, front, caliper, 4-piston -->
+    <tr class="listing-final-product">
+      <td>
+        <a href="/en/catalog/nissan/370z/brake_caliper/890123">
+          Centric Front RH Brake Caliper 4-Piston Sport
+        </a>
+      </td>
+      <td>$99.00</td>
+    </tr>
+
+  </tbody>
+</table>
+
+</body>
+</html>

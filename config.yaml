@@ -1,0 +1,61 @@
+vehicle:
+  year_range: "2009-2020"
+  make: "Nissan"
+  model: "370Z"
+  brake_package: "Sport Akebono"
+
+rockauto:
+  # source_mode: "rss" or "html"
+  source_mode: "rss"
+  # RockAuto closeout RSS URL (see README for how to find it)
+  rss_url: ""
+  # Alternative: direct HTML page URL
+  page_url: ""
+  request_timeout: 15
+  user_agent: "Mozilla/5.0 rockauto-closeout-watcher"
+
+monitor:
+  interval_minutes: 30
+  dry_run: false
+  debug_matching: true
+
+matching:
+  required_keywords:
+    - caliper
+
+  front_keywords:
+    - front
+
+  right_keywords:
+    - right
+    - front right
+    - right front
+    - passenger
+    - passenger side
+    - RH
+
+  sport_keywords:
+    - sport
+    - akebono
+    - 4 piston
+    - 4-piston
+    - with sport brakes
+    - w/ sport brakes
+
+  reject_keywords:
+    - left
+    - front left
+    - left front
+    - driver
+    - driver side
+    - LH
+    - rear
+    - rear left
+    - rear right
+
+discord:
+  # Resolved from the DISCORD_WEBHOOK_URL environment variable at runtime
+  webhook_url: "${DISCORD_WEBHOOK_URL}"
+
+storage:
+  seen_items_file: "data/seen_items.json"
