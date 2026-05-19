@@ -37,8 +37,14 @@ matching:
   sport_keywords:
     - sport
     - akebono
+    - nismo
+    - nismo tech
+    - sport tech
+    - touring sport
     - 4 piston
     - 4-piston
+    - 4-piston caliper
+    - 4 piston caliper
     - with sport brakes
     - w/ sport brakes
 
@@ -47,10 +53,17 @@ matching:
     - rear left
     - rear right
     - base model
+    - base brakes
     - standard brakes
+    - standard duty
+    - w/o sport
+    - without sport
     - 2-piston
     - 2 piston
+    - 1-piston
+    - 1 piston
     - single piston
+    - one piston
     - iron caliper
     - iron calipers
 
