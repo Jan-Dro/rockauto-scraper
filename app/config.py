@@ -13,6 +13,11 @@ from pathlib import Path
 from typing import Optional
 
 import yaml
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+except ImportError:
+    pass
 from pydantic import BaseModel, Field
 
 
