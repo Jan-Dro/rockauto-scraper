@@ -96,20 +96,27 @@ def parse_html(html: str, base_url: str = _ROCKAUTO_BASE) -> list[Listing]:
     """
     Parse listings from a RockAuto closeout HTML page (live or saved file).
 
-    RockAuto's HTML structure changes occasionally, so we use multiple
-    heuristics to stay resilient.
+    Strategy order:
+      1. RockAuto-specific  tbody.listing-inner  (real site structure)
+      2. Generic table rows with part keywords
+      3. Div/span blocks
+      4. Last-resort string search
     """
     soup = BeautifulSoup(html, "html.parser")
     listings: list[Listing] = []
 
-    # Strategy 1 — table rows that look like part listings
-    listings += _parse_table_rows(soup, base_url)
+    # Strategy 1 — RockAuto's real DOM structure
+    listings += _parse_rockauto_listing_inner(soup, base_url)
 
-    # Strategy 2 — div/span blocks labelled as part descriptions
+    # Strategy 2 — generic table rows
+    if not listings:
+        listings += _parse_table_rows(soup, base_url)
+
+    # Strategy 3 — div/span blocks labelled as part descriptions
     if not listings:
         listings += _parse_div_blocks(soup, base_url)
 
-    # Strategy 3 — fallback: any element with a part number pattern
+    # Strategy 4 — fallback: any element containing "caliper"
     if not listings:
         listings += _parse_fallback(soup, base_url)
 
@@ -122,6 +129,88 @@ def parse_html_file(path: str) -> list[Listing]:
     with open(path, "r", encoding="utf-8", errors="replace") as fh:
         html = fh.read()
     return parse_html(html)
+
+
+def _parse_rockauto_listing_inner(soup: BeautifulSoup, base_url: str) -> list[Listing]:
+    """
+    Parse RockAuto's real DOM structure, scoped to the 'Caliper' section only.
+
+    RockAuto uses <td class="nlabel"> elements as section headers:
+        <td class="nlabel">Brake Pad</td>   ← skip everything under here
+        <td class="nlabel">Caliper</td>     ← only parse rows under here
+        <td class="nlabel">Rotor</td>       ← stop here
+
+    Under each section, part listings live in:
+        <tbody class="listing-inner ...">
+          <span class="listing-final-manufacturer">BRAND</span>
+          <span class="listing-footnote-text">Front Right; 4 Piston Calipers</span>
+          <span class="listing-price">$45.99</span>
+          <a href="/en/moreinfo.php?...">...</a>
+        </tbody>
+    """
+    listings: list[Listing] = []
+
+    # Collect all elements that are either section labels or listing rows,
+    # in document order, so we can slice out just the Caliper section.
+    all_tags = soup.find_all(["td", "tbody"])
+
+    in_caliper_section = False
+
+    for tag in all_tags:
+        # Section header?
+        if tag.name == "td" and "nlabel" in tag.get("class", []):
+            section_name = tag.get_text(strip=True).lower()
+            if section_name == "caliper":
+                in_caliper_section = True
+                logger.debug("Entered Caliper section")
+            elif in_caliper_section:
+                # Hit the next section — stop
+                logger.debug("Left Caliper section at: %s", tag.get_text(strip=True))
+                break
+            continue
+
+        # Listing row?
+        if not in_caliper_section:
+            continue
+        if tag.name != "tbody" or "listing-inner" not in tag.get("class", []):
+            continue
+
+        try:
+            brand_el = tag.find("span", class_="listing-final-manufacturer")
+            brand = brand_el.get_text(strip=True) if brand_el else None
+
+            pn_el = tag.find("span", class_="listing-final-partnumber")
+            part_number = pn_el.get_text(strip=True) if pn_el else ""
+
+            footnote_el = tag.find("span", class_="listing-footnote-text")
+            footnote = footnote_el.get_text(" ", strip=True) if footnote_el else ""
+
+            price_el = tag.find("span", class_="listing-price")
+            price = price_el.get_text(strip=True) if price_el else None
+
+            link_el = tag.find("a", href=re.compile(r"moreinfo|catalog", re.I))
+            url = urljoin(base_url, link_el["href"]) if link_el else "unknown"
+
+            title_parts = [p for p in [brand, part_number, footnote] if p]
+            title = " — ".join(title_parts) if title_parts else footnote or "unknown"
+
+            listings.append(
+                Listing(
+                    title=title[:300],
+                    brand=brand,
+                    price=price,
+                    url=url,
+                    description=footnote,
+                    side=_extract_side(footnote),
+                    source="html",
+                )
+            )
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("listing-inner row error: %s", exc)
+            continue
+
+    logger.debug("Caliper section: found %d row(s)", len(listings))
+    return listings
 
 
 def _parse_table_rows(soup: BeautifulSoup, base_url: str) -> list[Listing]:

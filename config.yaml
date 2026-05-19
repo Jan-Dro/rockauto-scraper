@@ -6,11 +6,11 @@ vehicle:
 
 rockauto:
   # source_mode: "rss" or "html"
-  source_mode: "rss"
-  # RockAuto closeout RSS URL (see README for how to find it)
+  source_mode: "html"
+  # RockAuto closeout RSS URL (leave empty if using html mode)
   rss_url: ""
-  # Alternative: direct HTML page URL
-  page_url: ""
+  # Direct HTML page URL
+  page_url: "https://www.rockauto.com/closeouts/?carcode=3341239"
   request_timeout: 15
   user_agent: "Mozilla/5.0 rockauto-closeout-watcher"
 
@@ -52,6 +52,13 @@ matching:
     - rear
     - rear left
     - rear right
+    - base model
+    - standard brakes
+    - 2-piston
+    - 2 piston
+    - single piston
+    - iron caliper
+    - iron calipers
 
 discord:
   # Resolved from the DISCORD_WEBHOOK_URL environment variable at runtime

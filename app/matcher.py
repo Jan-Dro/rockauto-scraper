@@ -94,13 +94,15 @@ class Matcher:
             reasoning.append("SKIP: no front keyword")
         if not has_right:
             reasoning.append("SKIP: no right/passenger/RH keyword")
+        if not has_sport:
+            reasoning.append("SKIP: no sport/4-piston/akebono keyword (required)")
         if has_reject:
             reasoning.append(f"SKIP: reject keyword(s) found → {rejected}")
 
-        is_match = has_caliper and has_front and has_right and not has_reject
+        is_match = has_caliper and has_front and has_right and has_sport and not has_reject
 
         if is_match:
-            confidence = "confirmed" if has_sport else "possible"
+            confidence = "confirmed"
             reasoning.append(f"MATCH: confidence={confidence}")
         else:
             confidence = "none"

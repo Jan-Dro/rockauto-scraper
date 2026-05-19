@@ -78,17 +78,16 @@ class TestConfirmedMatches:
 # ---------------------------------------------------------------------------
 
 class TestPossibleMatches:
-    def test_front_right_caliper_no_sport(self, matcher):
+    def test_front_right_caliper_no_sport_not_a_match(self, matcher):
+        """Without sport/4-piston keyword, the part should NOT match (could be base)."""
         listing = make_listing("Front Right Brake Caliper")
         result = matcher.match(listing)
-        assert result.is_match is True
-        assert result.confidence == "possible"
+        assert result.is_match is False
 
-    def test_passenger_front_caliper_no_sport(self, matcher):
+    def test_passenger_front_caliper_no_sport_not_a_match(self, matcher):
         listing = make_listing("Passenger Front Brake Caliper")
         result = matcher.match(listing)
-        assert result.is_match is True
-        assert result.confidence == "possible"
+        assert result.is_match is False
 
 
 # ---------------------------------------------------------------------------
@@ -120,7 +119,23 @@ class TestNonMatches:
     def test_no_front_keyword(self, matcher):
         listing = make_listing("Right Brake Caliper Sport")
         result = matcher.match(listing)
-        # "right" is present but "front" is absent
+        # "right" is present, "sport" is present but "front" is absent
+        assert result.is_match is False
+
+    def test_no_sport_keyword(self, matcher):
+        listing = make_listing("Front Right Brake Caliper")
+        result = matcher.match(listing)
+        # sport/4-piston is required
+        assert result.is_match is False
+
+    def test_base_model_rejected(self, matcher):
+        listing = make_listing("Front Right Brake Caliper Base Model or Touring")
+        result = matcher.match(listing)
+        assert result.is_match is False
+
+    def test_two_piston_rejected(self, matcher):
+        listing = make_listing("Front Right; 2-Piston Caliper")
+        result = matcher.match(listing)
         assert result.is_match is False
 
     def test_empty_title(self, matcher):
@@ -170,7 +185,14 @@ class TestCalibrationReport:
         assert "SEND ALERT" in report
         assert "confirmed" in report.lower()
 
-    def test_non_match_report_contains_ignore(self, matcher):
+    def test_non_match_no_sport_contains_ignore(self, matcher):
+        listing = make_listing("Front Right Brake Caliper")
+        result = matcher.match(listing)
+        report = format_calibration_report(result)
+        assert "IGNORE" in report
+        assert "MATCH: NO" in report
+
+    def test_non_match_left_contains_ignore(self, matcher):
         listing = make_listing("Front Left Brake Caliper")
         result = matcher.match(listing)
         report = format_calibration_report(result)
