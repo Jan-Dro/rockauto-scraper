@@ -92,16 +92,17 @@ class Matcher:
             reasoning.append("SKIP: no required keyword (caliper)")
         if not has_front:
             reasoning.append("SKIP: no front keyword")
-        if not has_right:
-            reasoning.append("SKIP: no right/passenger/RH keyword")
         if not has_sport:
             reasoning.append("SKIP: no sport/4-piston/akebono keyword (required)")
         if has_reject:
             reasoning.append(f"SKIP: reject keyword(s) found → {rejected}")
 
-        is_match = has_caliper and has_front and has_right and has_sport and not has_reject
+        # Right-side keyword is preferred but not required —
+        # a front sport caliper on either side is worth alerting on.
+        is_match = has_caliper and has_front and has_sport and not has_reject
 
         if is_match:
+            # Boost confidence label when explicitly right/passenger side
             confidence = "confirmed"
             reasoning.append(f"MATCH: confidence={confidence}")
         else:

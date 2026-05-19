@@ -43,12 +43,6 @@ matching:
     - w/ sport brakes
 
   reject_keywords:
-    - left
-    - front left
-    - left front
-    - driver
-    - driver side
-    - LH
     - rear
     - rear left
     - rear right
